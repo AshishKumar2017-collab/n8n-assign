@@ -22,6 +22,20 @@ This document describes each node of the n8n workflow using clean formatting, ic
 
 ---
 
+
+## 🌐 2. **HTTP Request — “Fetch Input Parameters”**
+**Type:** HTTP Request  
+**Purpose:** Fetches initial parameters before Google Trends & YouTube API calls.  
+**Recommended Config:**
+- **Method:** GET  
+- **URL:** `https://api.example.com/inputs`  
+- **Headers:** Authorization Bearer Token  
+- **Output:** JSON with `topic`
+
+---
+
+
+
 ## 📈 3. **Google Trends — “Google Trends Fetcher”**
 **Type:** HTTP Request (or custom Trends node)  
 **Purpose:** Retrieves trend score + related searches for the input topic.
