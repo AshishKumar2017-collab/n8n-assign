@@ -11,45 +11,23 @@ This document describes each node of the n8n workflow using clean formatting, ic
 
 ---
 
-## 🌐 2. **HTTP Request — “Fetch Input Parameters”**
+
+## 📈 3. **Google Trends — “Fetch trending Google Trends keywords”**
 **Type:** HTTP Request  
-**Purpose:** Fetches initial parameters before Google Trends & YouTube API calls.  
+**Purpose:** Fetch trending Google Trends keywords
 **Recommended Config:**
 - **Method:** GET  
-- **URL:** `https://api.example.com/inputs`  
-- **Headers:** Authorization Bearer Token  
-- **Output:** JSON with `topic`
+- **URL:** `https://trends.google.com/trending?geo=IN`  
 
 ---
 
-
-## 🌐 2. **HTTP Request — “Fetch Input Parameters”**
-**Type:** HTTP Request  
-**Purpose:** Fetches initial parameters before Google Trends & YouTube API calls.  
+## ▶️ 4. **YouTube Topic — “Fetch trending YouTube video topics”**
+**Type:** HTTP Request
+**Purpose:** Fetch trending YouTube video topics.  
 **Recommended Config:**
 - **Method:** GET  
-- **URL:** `https://api.example.com/inputs`  
-- **Headers:** Authorization Bearer Token  
-- **Output:** JSON with `topic`
+- **URL:** `https://www.googleapis.com/youtube/v3/videos?chart=mostPopular&regionCode=US&part=snippet&maxResults=10&key=AIzaSyADMljdV0h0xDLzgQkYkUR_AGg-x8eei6w`  
 
----
-
-
-
-## 📈 3. **Google Trends — “Google Trends Fetcher”**
-**Type:** HTTP Request (or custom Trends node)  
-**Purpose:** Retrieves trend score + related searches for the input topic.
-
----
-
-## ▶️ 4. **YouTube Topic — “YouTube Topic Search”**
-**Type:** HTTP Request (YouTube Data API v3)  
-**Purpose:** Fetch relevant recent videos about the topic.  
-**Params:**
-- `q = {{ $json.topic }}`
-- `part = snippet`
-- `maxResults = 10`
-- `type = video`
 
 ---
 
