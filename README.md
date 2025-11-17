@@ -1,4 +1,4 @@
-# 📦 n8n Automation Package — Beautiful Version
+# 📦 n8n Automation Package 
 
 This ZIP contains:
 
