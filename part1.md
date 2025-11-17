@@ -31,41 +31,52 @@ This document describes each node of the n8n workflow using clean formatting, ic
 
 ---
 
-## 🧹 5. **Code Node — “Filter YouTube Results”**
-**Purpose:** Filters YouTube API output.  
+## 🧹 5. **Code Node — “Filter YouTube and mapping”**
+**Purpose:** Filter YouTube API output based on keywords.
 **Logic:**
-- Remove videos with low views  
-- Keep trending or “how to” content  
+- Keep only videos whose titles contain AI, Automation, ML, Robotics, or ChatGPT.
+- Extract title, channel, URL, and published date for further use.
 
 ```js
-const items = $input.all();
-const minViews = 10000;
+return $json["items"]
+  .filter(item => /AI|Automation|ML|Robotics|ChatGPT/i.test(item.snippet.title))
+  .map(item => ({
+    title: item.snippet.title,
+    channel: item.snippet.channelTitle,
+    url: `https://www.youtube.com/watch?v=${item.id}`,
+    publishedAt: item.snippet.publishedAt
+  }));
 
-return items
-  .filter(i => {
-    const stats = i.json.statistics || {};
-    const views = Number(stats.viewCount || 0);
-    const title = (i.json.snippet.title || "").toLowerCase();
-    return views >= minViews || title.includes("trend") || title.includes("how to");
-  })
-  .map(i => ({ json: i.json }));
 ```
 
 ---
 
 ## 🧩 6. **Code Node — “Format Google Trends”**
-**Purpose:** Normalize Trends data for the AI agent.  
+**Purpose:** Normalize Google Trends output for the AI agent and filter relevant keywords (AI, Automation, ML, Robotics, ChatGPT). 
 
 ```js
-const t = $input.item.json;
+// Get all input items from previous node
+const trends = $input.all();
 
-return [{
-  json: {
-    topic: t.keyword || "unknown",
-    trendScore: t.score || 0,
-    relatedQueries: (t.relatedQueries || []).slice(0, 5)
-  }
-}];
+// Process each trend item
+return trends
+  .map(item => {
+    const t = item.json;
+    return {
+      json: {
+        // Take keyword or title, default to 'unknown'
+        topic: t.keyword || t.title || "unknown",
+        // Trend score or default 0
+        trendScore: t.score || 0,
+        // Top 5 related queries
+        relatedQueries: (t.relatedQueries || []).slice(0, 5)
+      }
+    };
+  })
+  // Filter only AI/Automation/ML/Robotics/ChatGPT related keywords
+  .filter(item => /AI|Automation|ML|Robotics|ChatGPT/i.test(item.json.topic));
+
+
 ```
 
 ---
