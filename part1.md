@@ -1,6 +1,6 @@
-# 🌟 Part 1 — Node‑by‑Node Export (Beautifully Formatted)
+# 🌟 Part 1 — Node‑by‑Node Export 
 
-This document describes each node of the n8n workflow using clean formatting, icons, and structured sections.
+This document describes each node of the n8n workflow.
 
 ---
 
@@ -90,46 +90,67 @@ return trends
 
 ## 🤖 8. **Prompt Agent — “AI Prompt Generator (Google Router)”**
 **Purpose:** Generates outlines + prompt seeds for the topic.  
-**Payload Example:**
-```json
-{
-  "type": "prompt_generation",
-  "topic": "{{ $json.topic }}",
-  "trendScore": {{ $json.trendScore }},
-  "relatedQueries": {{ $json.relatedQueries }}
-}
-```
+**OpenRouter Chat model:** Api for using this model was free so i used this instead of OpenAi.
+**Recommended Config:**
+- **Method:** deepseek-chat-v3.1 
+- **Response Format:** return [{  prompt_output: response }];.
+
+**System Message:** You are a prompt generator. 
+You will receive a JSON object with the following fields: topic, link, source, channel. 
+Your task is to create a content prompt that can be fed into another AI model to generate a blog post. 
+Make sure the prompt is clear, includes the topic, mentions the source, and gives instructions for writing a 300-word blog post.
+Return only the prompt as plain text.
 
 ---
 
-## ✍️ 9. **Content Creator Agent — “AI Content Generator”**
-**Purpose:** Produces full content (title, script, tags, description).  
+## ✍️ 9. **Content Creator Agent — “AI Content Generator”**”**
+**Purpose:** Produces full content.  
+**OpenRouter Chat model:** Api for using this model was free so i used this instead of OpenAi.
+**Recommended Config:**
+- **Method:** deepseek-chat-v3.1 
+- **Response Format:** return [{  content_output: response }];.
+  
+**System Message:** You are an expert content writer. Write engaging, clear, and well-structured blog posts based on the given prompt. 
 
 ---
 
 ## 📊 10. **Google Sheets — “Append Content Row”**
 **Operation:** Append Row  
 **Columns:**  
-- Title  
-- Description  
-- Tags  
-- GeneratedAt  
-- TrendScore  
+- Topic  
+- Prompt  
+- Blog content 
+- video  
+- Timestamp
+- Status  
 
 ---
 
 ## 📧 11. **Gmail — “Send Notification Email”**
-**Purpose:** Delivers completed content to editor/team.
+**Purpose:** Delivers completed content (blog + video) to the editor/team for review.
+
+**Configuration Example:**
+
+- **Resource:** Gmail  
+- **Operation:** Send  
+- **To:** `mahanakiiti@gmail.com` 
+- **Subject:** `New Content Submitted for Review — {{$json.topic}}`  
+- **Message Type:** HTML  
+- **Message:**
+
+```html
+<h2>New Content Submitted for Review</h2>
+
+<p><strong>Topic:</strong> {{$json.topic}}</p>
+
+<p><strong>Blog Content:</strong></p>
+<p>{{$json.output}}</p>
+
+<p><strong>Video Link:</strong> <a href="{{$json.video}}">{{$json.video}}</a></p>
+
+<p><strong>Timestamp:</strong> {{$json.timestamp}}</p>
+
+<p>Status: <strong>Pending Review</strong></p>
 
 ---
 
-## 🔗 12. **Merge Node (if used)**
-**Mode:** *Wait for All Inputs*  
-**Purpose:** Ensures Trends + YouTube data combine properly.
-
----
-
-## ⚠️ 13. **Error Handler Node (optional)**
-Routes failures to retry or admin alert.
-
----
